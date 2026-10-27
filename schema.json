@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "saved": "2026-10-27",
+  "files": {
+    "sales": "19987cb2-_____202601-09____.xlsx",
+    "collection": "81620b9a-_4___________________19______.xlsx",
+    "prev": "351aeb64-_____RAW2025_____.xlsx"
+  },
+  "sales": {
+    "headerRow": 4,
+    "headers": [
+      {
+        "col": "A",
+        "label": "순위"
+      },
+      {
+        "col": "B",
+        "label": "매장명"
+      },
+      {
+        "col": "C",
+        "label": "매장코드"
+      },
+      {
+        "col": "D",
+        "label": "브랜드"
+      },
+      {
+        "col": "E",
+        "label": "팀"
+      },
+      {
+        "col": "F",
+        "label": "실판금액"
+      },
+      {
+        "col": "G",
+        "label": "비교(YYYY-MM)"
+      },
+      {
+        "col": "H",
+        "label": "증감(%)"
+      },
+      {
+        "col": "I",
+        "label": "원가율(%)"
+      },
+      {
+        "col": "J",
+        "label": "목표금액"
+      },
+      {
+        "col": "K",
+        "label": "달성률(%)"
+      }
+    ]
+  },
+  "collection": {
+    "sheet": "YYYY (1~N누계)",
+    "headerRows": [
+      2,
+      3
+    ],
+    "id": [
+      {
+        "col": "A",
+        "label": "코드"
+      },
+      {
+        "col": "C",
+        "label": "계열"
+      },
+      {
+        "col": "D",
+        "label": "유통구분"
+      },
+      {
+        "col": "E",
+        "label": "팀구분"
+      },
+      {
+        "col": "F",
+        "label": "매장명"
+      },
+      {
+        "col": "G",
+        "label": "폐점일"
+      }
+    ],
+    "block": [
+      "매출",
+      "임대관리비",
+      "수금",
+      "유통수수료율"
+    ],
+    "cum": [
+      {
+        "col": "AR",
+        "label": "N월 누계"
+      },
+      {
+        "col": "AS",
+        "label": "매출",
+        "top": "1~N"
+      },
+      {
+        "col": "AT",
+        "label": "수금"
+      },
+      {
+        "col": "AU",
+        "label": "매니저 마진"
+      }
+    ]
+  },
+  "prev": {
+    "sheet": "종합",
+    "headerRow": 1,
+    "headers": [
+      {
+        "col": "A",
+        "label": "구분"
+      },
+      {
+        "col": "B",
+        "label": "매장코드"
+      },
+      {
+        "col": "C",
+        "label": "매장명"
+      },
+      {
+        "col": "D",
+        "label": "매출"
+      },
+      {
+        "col": "E",
+        "label": "실수금"
+      },
+      {
+        "col": "F",
+        "label": "%"
+      }
+    ]
+  }
+}

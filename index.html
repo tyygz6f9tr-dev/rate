@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>임대매장 유통수수료율 월별 현황 만들기 | INDONG FN</title>
+<style>
+  :root{
+    --ink:#111827; --sub:#4b5563; --line:#e5e7eb; --bg:#f4f5f7; --card:#fff;
+    --accent:#111827; --pink:#ec4899; --cyan:#06b6d4; --purple:#8b5cf6;
+    --warn:#b45309; --warn-bg:#fffbeb; --err:#b91c1c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:15px;line-height:1.55;padding:28px 16px 48px}
+  .wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+  header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;padding-bottom:16px;border-bottom:3px solid var(--ink)}
+  h1{font-size:24px;margin:0 0 6px}
+  header p{margin:0;color:var(--sub)}
+  .brandbar{display:flex;gap:6px}
+  .brandbar i{width:28px;height:6px;border-radius:3px;display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .card h2{font-size:18px;margin:0 0 14px}
+  .uploads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .up{border:1.5px dashed #cbd5e1;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+  .up .tag{font-size:12px;font-weight:700;color:#fff;background:var(--ink);border-radius:999px;padding:2px 9px;align-self:flex-start}
+  .up .tag.opt{background:#9ca3af}
+  .up b{font-size:15.5px}
+  .up .desc{font-size:13px;color:var(--sub)}
+  .up label.pick{display:inline-flex;align-items:center;gap:8px;cursor:pointer;background:#f3f4f6;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-weight:600;font-size:14px;align-self:flex-start}
+  .up label.pick:hover{background:#e5e7eb}
+  .up input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+  .up .fname{font-size:13px;color:var(--sub);word-break:break-all}
+  .up select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;max-width:100%}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+  button{font:inherit;font-weight:700;border-radius:10px;border:1px solid var(--ink);padding:10px 18px;cursor:pointer;background:var(--ink);color:#fff}
+  button.ghost{background:#fff;color:var(--ink)}
+  button:disabled{opacity:.5;cursor:wait}
+  button:focus-visible,label.pick:focus-within{outline:3px solid #93c5fd;outline-offset:2px}
+  .status{font-size:14px;color:var(--sub)}
+  .status.err{color:var(--err);font-weight:700}
+  .rules{margin:0;padding-left:18px;color:var(--sub);font-size:14px;display:flex;flex-direction:column;gap:3px}
+  .facts{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:4px}
+  .summary h3{font-size:15px;margin:16px 0 6px}
+  .list{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:2px}
+  .list.warn{color:var(--warn)}
+  .muted{color:var(--sub);font-size:14px;margin:0}
+  .preview-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+  iframe{width:100%;height:80vh;border:1px solid var(--line);border-radius:10px;background:#f4f5f7}
+  .chip{display:inline-block;font-weight:700;font-size:14px;border-radius:999px;padding:4px 12px;margin:0 0 8px}
+  .chip.ok{background:#dcfce7;color:#166534}
+  .chip.warn{background:var(--warn-bg);color:var(--warn)}
+  .chip.bad{background:#fee2e2;color:var(--err)}
+  .tbl{overflow-x:auto;margin-top:8px}
+  table.diff{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+  table.diff th{background:#f8f9fb;border:1px solid var(--line);padding:7px 8px;text-align:left;font-weight:700}
+  table.diff td{border:1px solid var(--line);padding:7px 8px;vertical-align:top}
+  table.diff tr.req td{background:#fff7f7}
+  table.diff .col{color:var(--sub);font-size:12.5px;white-space:nowrap}
+  .t{font-weight:700;font-size:12.5px;border-radius:6px;padding:2px 7px;white-space:nowrap}
+  .t-추가{background:#dbeafe;color:#1d4ed8}.t-삭제{background:#fee2e2;color:var(--err)}.t-변경{background:#fef3c7;color:var(--warn)}
+  .need{color:var(--err);font-size:13px}
+  @media (max-width:860px){.uploads{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>▶ 임대매장 유통수수료율 월별 현황 만들기</h1>
+      <p>엑셀 파일을 올리면 월별 매출·신장률·수수료율 페이지를 만들어요. 파일은 서버로 전송되지 않고 이 브라우저 안에서만 처리돼요.</p>
+    </div>
+    <div class="brandbar" aria-hidden="true"><i style="background:var(--pink)"></i><i style="background:var(--cyan)"></i><i style="background:var(--purple)"></i></div>
+  </header>
+
+  <section class="card">
+    <h2>1. 파일 선택</h2>
+    <div class="uploads">
+      <div class="up">
+        <span class="tag">필수</span>
+        <b>월별 판매현황</b>
+        <span class="desc">시트가 '1월', '2월' … 'N월'로 나뉜 파일. 각 시트의 <b>실판금액</b>(올해)과 <b>비교</b>(작년) 열로 매출·신장률을 계산해요.</span>
+        <label class="pick">파일 선택<input type="file" id="fileSales" accept=".xlsx"></label>
+        <span class="fname" id="fileSalesName">선택된 파일 없음</span>
+      </div>
+      <div class="up">
+        <span class="tag">필수</span>
+        <b>수금 파일 (임대매장 유통수수료율 월별누계)</b>
+        <span class="desc">'1~N누계' 시트의 월별 <b>유통수수료율</b>과 <b>N월 누계</b> 수수료율을 가져와요. 주요매장은 <b>코드 칸 초록색 칠</b> 또는 '주요매장' 열 표시로 골라요.</span>
+        <label class="pick">파일 선택<input type="file" id="fileColl" accept=".xlsx"></label>
+        <span class="fname" id="fileCollName">선택된 파일 없음</span>
+        <select id="collSheet" disabled aria-label="수금 파일 시트 선택"></select>
+      </div>
+      <div class="up">
+        <span class="tag opt">선택</span>
+        <b>전년실적 (매출·수수료 RAW)</b>
+        <span class="desc">'종합' 시트의 <b>매장코드 · 매출 · %</b> 열로 전년실적과 전년 수수료율 칸을 채워요. 없으면 비워둬요.</span>
+        <label class="pick">파일 선택<input type="file" id="filePrev" accept=".xlsx"></label>
+        <span class="fname" id="filePrevName">선택된 파일 없음</span>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" id="btnRun">현황 만들기</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>계산 규칙</h2>
+    <ul class="rules">
+      <li>브랜드: 매장코드 첫 글자 S = 쉬즈미스, T = 리스트, A = 시스티나</li>
+      <li>행사 매장: 매장명 앞에 (행)이 붙은 매장은 같은 브랜드에서 (행)을 뺀 이름이 같은 본 매장에 합산하고, 매장코드는 본 매장 코드를 써요. 예) T42017 (행)스타필드안성 → T42012 스타필드안성</li>
+      <li>월별 신장률 = 그달 실판금액 ÷ 작년 같은 달 − 1 / 누계 신장률 = 1~N월 실판금액 합 ÷ 작년 1~N월 합 − 1</li>
+      <li>월별 수수료율 = 수금 파일의 그달 유통수수료율 / 합계 수수료율 = 수금 파일의 N월 누계 값</li>
+      <li>빨간 칸 = 수수료율 40% 이상</li>
+    </ul>
+  </section>
+
+  <section class="card" id="schemaCard" hidden>
+    <div class="preview-head">
+      <h2 style="margin:0">컬럼 변경 확인 (전달 기준과 비교)</h2>
+      <button type="button" class="ghost" id="btnSchema">이번 달 컬럼을 새 기준으로 저장 (schema.json)</button>
+    </div>
+    <div id="schemaBox"></div>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <div class="preview-head">
+      <h2 style="margin:0">2. 결과</h2>
+      <div class="actions" style="margin:0">
+        <button type="button" id="btnSave">HTML 파일로 저장</button>
+        <button type="button" class="ghost" id="btnOpen">새 창에서 보기</button>
+      </div>
+    </div>
+    <div class="summary" id="summary"></div>
+    <h3 style="font-size:15px;margin:18px 0 8px">미리보기</h3>
+    <iframe id="preview" title="결과 미리보기"></iframe>
+  </section>
+</div>
+<script src="xlsx-lite.js"></script>
+<script src="schema-check.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

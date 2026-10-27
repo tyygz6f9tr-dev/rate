@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>__TITLE__</title>
+<style>
+  :root{
+    --pink:#ec4899; --pink-bg:#fdf2f8;
+    --cyan:#06b6d4; --cyan-bg:#ecfeff;
+    --purple:#8b5cf6; --purple-bg:#f5f3ff;
+    --text:#111827; --sub:#6b7280; --line:#e5e7eb; --card:#ffffff; --bg:#f4f5f7;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;background:var(--bg);color:var(--text);padding:32px;}
+  .wrap{max-width:1280px;margin:0 auto;}
+  header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;padding-bottom:20px;border-bottom:3px solid var(--text);}
+  header h1{font-size:25px;margin:0 0 6px;}
+  header .sub{color:#000;font-size:16px;}
+  header .company{font-size:18px;font-weight:700;text-align:right;}
+  header .unit{color:#000;font-size:15px;text-align:right;margin-top:4px;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+  .kpi{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .kpi .label{font-size:15px;color:#000;margin-bottom:6px;}
+  .kpi .value{font-size:25px;font-weight:700;color:#000;}
+  .kpi .value.blue{color:#000;}
+  .kpi .value.orange{color:#000;}
+
+  .brand-section{background:var(--card);border-radius:14px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden;position:relative;}
+  .unit-note{text-align:right;font-size:13px;color:#000;padding:8px 22px 0;}
+  .brand-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;border-left:6px solid var(--accent);}
+  .brand-header:hover{background:var(--accent-bg);}
+  .brand-title{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:#000;}
+  .brand-title .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);}
+  .brand-stats{display:flex;gap:26px;font-size:16px;color:#000;}
+  .brand-stats b{color:#000;font-size:17px;}
+  .brand-stats .rate{color:#000;font-weight:700;}
+  .chevron{transition:transform .2s;color:#000;}
+  .brand-section.open .chevron{transform:rotate(180deg);}
+  .brand-body{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+  .brand-section.open .brand-body{max-height:4000px;}
+
+  .table-scroll{overflow-x:auto;padding:0 18px 20px;}
+  table{border-collapse:collapse;width:100%;min-width:1100px;font-size:15.5px;table-layout:fixed;}
+  thead tr.grp th{width:__MW__%;}
+  thead tr.grp th:nth-child(1){width:10%;}
+  thead tr.grp th:nth-child(2){width:7%;}
+  thead tr.grp th.total-th, thead tr.grp th.prev-th{width:9.9%;}
+  thead tr.grp th.prev-th{background:#4b5563;}
+  td.prev-col{background:#f9fafb !important;color:#374151 !important;font-weight:600;border-left:2px solid #9ca3af !important;}
+  tbody tr.commission-row td.prev-col{color:#374151 !important;}
+  thead tr.grp th{background:var(--accent);color:#fff;font-weight:700;padding:8px 6px;text-align:center;border:1px solid rgba(255,255,255,.25);}
+  thead tr.sub th{background:#f8f9fb;color:#000;font-weight:600;padding:6px;text-align:center;border:1px solid var(--line);font-size:14.5px;}
+  tbody td{padding:7px 6px;text-align:center;border:1px solid var(--line);white-space:nowrap;color:#000;overflow:hidden;text-overflow:ellipsis;}
+  tbody td.name, td.rate-label{white-space:normal;overflow:visible;text-overflow:clip;}
+  tbody tr.sales-row td{background:#fff;}
+  tbody tr.rate-row td{background:#fafbfc;color:#000;font-size:14.5px;}
+  tbody tr.commission-row td{background:#eff6ff;color:#1d4ed8;font-weight:700;}
+  tbody tr.commission-row td.rate-label{color:#1d4ed8;}
+  tbody tr.commission-row td.total-col{background:#dbeafe !important;}
+  td.rate-label{text-align:left;padding-left:10px;color:#000;}
+  tbody td.name{text-align:left;padding-left:10px;font-weight:700;vertical-align:middle;background:#fff;}
+  tbody td.name .code-sub{display:block;font-weight:400;font-size:12.5px;color:#000;margin-top:2px;}
+  tbody tr.sales-row td.rate-label{font-style:normal;font-weight:600;}
+  tbody tr.rate-row td.rate-label{font-style:italic;}
+  td.num{text-align:right;padding-right:10px;font-variant-numeric:tabular-nums;}
+  tbody tr.sales-row:hover td, tbody tr.sales-row:hover + tr.rate-row td{background:var(--accent-bg);}
+  td.total-col{font-weight:700;background:#f3f4f6 !important;}
+  .search-bar{display:flex;align-items:center;gap:10px;margin:-14px 0 18px;}
+  .search-box{position:relative;width:340px;}
+  .search-box input{width:100%;padding:10px 36px 10px 38px;font-size:15px;font-family:inherit;border:1px solid var(--line);border-radius:10px;background:#fff;color:#000;box-shadow:0 1px 3px rgba(0,0,0,.06);outline:none;}
+  .search-box input:focus{border-color:#111827;}
+  .search-box .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#6b7280;font-size:15px;pointer-events:none;}
+  .search-box .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;color:#6b7280;font-size:18px;cursor:pointer;display:none;padding:2px 6px;}
+  .search-result{font-size:14px;color:#000;}
+  .brand-section.no-match{display:none;}
+  tbody.store-group.hide{display:none;}
+  mark{background:#fef08a;color:inherit;padding:0 1px;border-radius:2px;}
+  .no-result{display:none;background:#fff;border-radius:14px;padding:28px;text-align:center;color:#6b7280;font-size:15px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  td.growth-neg{color:#dc2626 !important;}
+  .rate-high{color:#dc2626 !important;font-weight:700 !important;background:#fee2e2 !important;box-shadow:inset 0 0 0 1px #fca5a5 !important;position:relative;z-index:1;}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>▶ 임대매장 유통수수료율 월별 현황</h1>
+      <div class="sub">__PERIOD__ · 매장별 월별 매출 및 수수료율</div>
+    </div>
+    <div>
+      <div class="company">INDONG FN</div>
+      <div class="unit">(단위: 백만원, VAT+)</div>
+    </div>
+  </header>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="search-bar">
+    <div class="search-box">
+      <span class="icon">🔍</span>
+      <input type="text" id="storeSearch" placeholder="매장명 또는 코드로 찾기" autocomplete="off">
+      <button type="button" class="clear" id="searchClear" title="지우기">×</button>
+    </div>
+    <span class="search-result" id="searchResult"></span>
+  </div>
+
+  <div id="brandSections"></div>
+  <div class="no-result" id="noResult">검색 결과가 없습니다.</div>
+</div>
+
+<script>
+const DATA = __DATA__;
+
+const BRAND_STYLE = {
+  '쉬즈미스': {accent:'#ec4899', bg:'#fdf2f8'},
+  '리스트':   {accent:'#06b6d4', bg:'#ecfeff'},
+  '시스티나': {accent:'#8b5cf6', bg:'#f5f3ff'}
+};
+const MONTHS = __MONTHS__;
+
+function fmtSales(v){
+  if(v===null || v===undefined || isNaN(v)) return '-';
+  return Math.round(v).toLocaleString('ko-KR');
+}
+function fmtRate(v){
+  if(v===null || v===undefined || isNaN(v)) return '-';
+  return (v*100).toFixed(1)+'%';
+}
+function fmtGrowth(v){
+  if(v===null || v===undefined || isNaN(v)) return '-';
+  const pct = v*100;
+  const sign = pct>0 ? '+' : '';
+  return sign+pct.toFixed(1)+'%';
+}
+function growthClass(v){
+  return (typeof v==='number' && !isNaN(v) && v<0) ? 'growth-neg' : '';
+}
+function rateClass(v){
+  if(v===null||v===undefined||isNaN(v)) return '';
+  if(v>=0.40) return 'rate-high';
+  return '';
+}
+
+function computeBrandKpi(stores){
+  let totalSales = 0, totalO = 0, totalP = 0;
+  stores.forEach(s=>{
+    totalSales += s.total_sales||0;
+    totalO += s.total_o||0;
+    totalP += s.total_p||0;
+  });
+  const avgRate = totalO? (totalO-totalP)/totalO : 0;
+  return {storeCount:stores.length, totalSales, avgRate};
+}
+
+function render(){
+  const brands = Object.keys(DATA);
+  let overallSales=0, overallComm=0, overallStores=0;
+  const brandKpis = {};
+  brands.forEach(b=>{
+    const k = computeBrandKpi(DATA[b]);
+    brandKpis[b]=k;
+    overallSales += k.totalSales;
+    overallComm += k.totalSales*k.avgRate;
+    overallStores += k.storeCount;
+  });
+  const overallRate = overallSales? overallComm/overallSales : 0;
+
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi"><div class="label">전체 매장수</div><div class="value">${overallStores}개</div></div>
+    <div class="kpi"><div class="label">누계 합계 매출</div><div class="value blue">${fmtSales(overallSales)}백만원</div></div>
+    <div class="kpi"><div class="label">전체 총 수수료율</div><div class="value orange">${fmtRate(overallRate)}</div></div>
+    <div class="kpi"><div class="label">브랜드 수</div><div class="value">${brands.length}개</div></div>
+  `;
+
+  const container = document.getElementById('brandSections');
+  container.innerHTML='';
+
+  brands.forEach((brand, idx)=>{
+    const style = BRAND_STYLE[brand] || {accent:'#374151', bg:'#f3f4f6'};
+    const k = brandKpis[brand];
+    const stores = DATA[brand];
+
+    const section = document.createElement('div');
+    section.className = 'brand-section' + (idx===0 ? ' open' : '');
+    section.style.setProperty('--accent', style.accent);
+    section.style.setProperty('--accent-bg', style.bg);
+
+    let rowsHtml = '';
+    stores.forEach(s=>{
+      let salesCells = '';
+      let growthCells = '';
+      let rateCells = '';
+      for(let i=0;i<MONTHS.length;i++){
+        salesCells += `<td class="num">${fmtSales(s.sales[i])}</td>`;
+        growthCells += `<td class="num ${growthClass(s.growth[i])}">${fmtGrowth(s.growth[i])}</td>`;
+        rateCells += `<td class="num ${rateClass(s.rates[i])}">${fmtRate(s.rates[i])}</td>`;
+      }
+      rowsHtml += `<tbody class="store-group" data-name="${s.name}" data-code="${s.code}">
+        <tr class="sales-row">
+          <td class="name" rowspan="3"><span class="store-name">${s.name}</span><span class="code-sub">${s.code}</span></td>
+          <td class="rate-label">매출</td>
+          ${salesCells}
+          <td class="num total-col">${fmtSales(s.total_sales)}</td>
+          <td class="num prev-col">${fmtSales(s.prev_sales)}</td>
+        </tr>
+        <tr class="rate-row">
+          <td class="rate-label">신장률</td>
+          ${growthCells}
+          <td class="num total-col ${growthClass(s.total_growth)}">${fmtGrowth(s.total_growth)}</td>
+          <td class="num prev-col"></td>
+        </tr>
+        <tr class="rate-row commission-row">
+          <td class="rate-label">수수료율</td>
+          ${rateCells}
+          <td class="num total-col ${rateClass(s.total_rate)}">${fmtRate(s.total_rate)}</td>
+          <td class="num prev-col ${rateClass(s.prev_rate)}">${fmtRate(s.prev_rate)}</td>
+        </tr>
+      </tbody>`;
+    });
+
+    section.innerHTML = `
+      <div class="unit-note">(단위:백만, %, VAT+)</div>
+      <div class="brand-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="brand-title"><span class="dot"></span>${brand}</div>
+        <div class="brand-stats">
+          <span>매장수 <b>${k.storeCount}개</b></span>
+          <span>누계 매출 <b>${fmtSales(k.totalSales)}백만원</b></span>
+          <span>총 수수료율 <b class="rate">${fmtRate(k.avgRate)}</b></span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="brand-body">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr class="grp">
+                <th>매장</th>
+                <th>구분</th>
+                ${MONTHS.map(m=>`<th>${m}</th>`).join('')}
+                <th class="total-th">합계</th>
+                <th class="prev-th">전년실적</th>
+              </tr>
+            </thead>
+            ${rowsHtml}
+          </table>
+        </div>
+      </div>
+    `;
+    container.appendChild(section);
+  });
+}
+
+render();
+
+// ── 매장명 찾기 ──
+(function(){
+  const input = document.getElementById('storeSearch');
+  const clearBtn = document.getElementById('searchClear');
+  const result = document.getElementById('searchResult');
+  const noResult = document.getElementById('noResult');
+  const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const norm = t => t.replace(/\s+/g,'').toLowerCase();
+  let openState = null;
+
+  function apply(){
+    const q = norm(input.value);
+    clearBtn.style.display = input.value ? 'block' : 'none';
+    const sections = document.querySelectorAll('.brand-section');
+
+    if(!q){
+      document.querySelectorAll('tbody.store-group').forEach(g=>{
+        g.classList.remove('hide');
+        g.querySelector('.store-name').textContent = g.dataset.name;
+      });
+      sections.forEach((sec,i)=>{
+        sec.classList.remove('no-match');
+        if(openState) sec.classList.toggle('open', openState[i]);
+      });
+      openState = null;
+      result.textContent = '';
+      noResult.style.display = 'none';
+      return;
+    }
+    if(!openState) openState = [...sections].map(s=>s.classList.contains('open'));
+
+    let total = 0;
+    sections.forEach(sec=>{
+      let cnt = 0;
+      sec.querySelectorAll('tbody.store-group').forEach(g=>{
+        const name = g.dataset.name, code = g.dataset.code;
+        const hit = norm(name).includes(q) || code.toLowerCase().includes(q);
+        g.classList.toggle('hide', !hit);
+        const el = g.querySelector('.store-name');
+        if(hit && input.value.trim() && name.includes(input.value.trim())){
+          el.innerHTML = name.replace(new RegExp(esc(input.value.trim()),'g'), m=>`<mark>${m}</mark>`);
+        } else {
+          el.textContent = name;
+        }
+        if(hit) cnt++;
+      });
+      sec.classList.toggle('no-match', cnt===0);
+      sec.classList.toggle('open', cnt>0);
+      total += cnt;
+    });
+    result.innerHTML = `<b>${total}개</b> 매장`;
+    noResult.style.display = total===0 ? 'block' : 'none';
+  }
+
+  input.addEventListener('input', apply);
+  input.addEventListener('keydown', e=>{ if(e.key==='Escape'){ input.value=''; apply(); } });
+  clearBtn.addEventListener('click', ()=>{ input.value=''; apply(); input.focus(); });
+})();
+</script>
+</body>
+</html>
